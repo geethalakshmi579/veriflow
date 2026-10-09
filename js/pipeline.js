@@ -55,9 +55,9 @@
     var rows = [];
     var duplicatesBlocked = 0;
 
-    // Sort oldest-first so the newest duplicate wins.
+    // Sort newest-first so the newest duplicate wins.
     var ordered = bronzeRows.slice().sort(function (a, b) {
-      return String(a.verified_at) < String(b.verified_at) ? -1 : 1;
+      return String(a.verified_at) > String(b.verified_at) ? -1 : 1;
     });
 
     ordered.forEach(function (r) {
