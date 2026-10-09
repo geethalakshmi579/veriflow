@@ -1,0 +1,21 @@
+{
+  "name": "veriflow",
+  "version": "1.0.0",
+  "description": "VeriFlow — customer onboarding demo: verify a mobile ID with Credence ID, land trusted records in a data pipeline.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "test": "node test/pipeline.test.js",
+    "verify": "npm run build && npm test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@credenceid/online-verifier": "^0.2.0",
+    "qrcode-generator": "^1.4.4"
+  }
+}

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VeriFlow — Verified identity in, trusted customer data out</title>
+  <meta
+    name="description"
+    content="Demo: verify a customer's mobile ID with Credence ID and land trusted records straight into a data pipeline. Built for a Solutions Engineer take-home assignment."
+  />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path
+            d="M16 2l12 5v8c0 7.5-5.1 12.4-12 15C9.1 27.4 4 22.5 4 15V7l12-5z"
+            fill="#0e9f8a"
+          />
+          <path
+            d="M11 16.5l3.5 3.5L21.5 13"
+            stroke="#fff"
+            stroke-width="2.6"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <div>
+          <div class="brand-name">Northgate Bank</div>
+          <div class="brand-sub">VeriFlow onboarding demo</div>
+        </div>
+      </div>
+      <a
+        class="github-link"
+        href="https://github.com/geethalakshmi579/veriflow"
+        target="_blank"
+        rel="noopener"
+        >View source</a
+      >
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Verified identity in.<br />Trusted customer data out.</h1>
+      <p class="lede">
+        See how Northgate Bank verifies new customers with the mobile IDs
+        already in their wallets — then lands clean, trusted records straight
+        into its data pipeline. No fake signups. No dirty identity data.
+        Powered by <strong>Credence&nbsp;ID</strong>.
+      </p>
+    </section>
+
+    <ol class="stepper">
+      <li data-step="1" class="current"><span class="n">1</span> Apply</li>
+      <li data-step="2"><span class="n">2</span> Verify ID</li>
+      <li data-step="3"><span class="n">3</span> Trust the data</li>
+    </ol>
+
+    <!-- STEP 1 -->
+    <section class="step-panel card active" data-step="1">
+      <h2>Open a new account</h2>
+      <p class="muted">
+        Start a fictional application. In step 2 you'll prove you are who you
+        say you are with your phone's wallet.
+      </p>
+      <form id="apply-form" class="form">
+        <div class="form-row">
+          <label>First name
+            <input id="first-name" name="firstName" autocomplete="given-name" required />
+          </label>
+          <label>Last name
+            <input id="last-name" name="lastName" autocomplete="family-name" required />
+          </label>
+        </div>
+        <label>Email
+          <input id="email" name="email" type="email" autocomplete="email" required />
+        </label>
+        <button type="submit" class="btn primary">Continue to verification</button>
+      </form>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step-panel card" data-step="2">
+      <h2>Verify your identity</h2>
+      <p class="muted">
+        Applying as <strong id="applicant-summary">—</strong>. Prove it with a
+        mobile driver's license or digital ID from Apple&nbsp;Wallet,
+        Google&nbsp;Wallet, Samsung&nbsp;Wallet, or your state's wallet app.
+      </p>
+
+      <div id="verify-live" style="display: none">
+        <div id="verify-status" class="status">Preparing…</div>
+        <div class="verify-actions">
+          <ov-w3c-btn text="Verify with Mobile ID" class="btn-verify"></ov-w3c-btn>
+        </div>
+        <div id="qr-card" class="qr-card" style="display: none">
+          <div id="qr-code" class="qr-code" role="img" aria-label="QR code to scan with your wallet app"></div>
+          <p class="muted small">
+            Scan with your phone's camera or wallet app, then approve the share
+            request. The page listens for your wallet — no refresh needed.
+          </p>
+        </div>
+        <p id="verify-hint" class="hint" style="display: none">
+          Tip: this usually means the SDK key/profile is wrong, or this site's
+          domain isn't registered in your Verify&nbsp;with&nbsp;Credence
+          portal profile. See <code>js/config.js</code> and the README.
+        </p>
+      </div>
+
+      <div id="verify-placeholder" class="notice" style="display: none">
+        <h3>One setup step before live verification</h3>
+        <p>
+          This demo calls the real Credence&nbsp;ID Online Verifier backend. To
+          enable it:
+        </p>
+        <ol>
+          <li>Register (free) at <strong>verify.credenceid.com</strong> and generate an SDK key.</li>
+          <li>Paste your <code>licenseKey</code> and <code>profileId</code> into <code>js/config.js</code>.</li>
+          <li>Register this site's exact public domain in your verification profile in the portal.</li>
+        </ol>
+        <p class="muted small">
+          The page degrades gracefully until then — nothing here is simulated.
+        </p>
+        <button id="preview-pipeline" class="btn secondary" type="button">
+          Preview the data pipeline (synthetic data)
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step-panel" data-step="3">
+      <div id="verified-card" class="card verified-card"></div>
+
+      <p id="pipeline-note" class="muted"></p>
+
+      <div class="pipeline">
+        <div class="card layer">
+          <h3><span class="layer-tag bronze">Bronze</span> Raw ingestion</h3>
+          <p class="muted small">
+            Every verification lands here exactly as received — seeded history
+            plus the live record, flagged <strong>NEW</strong>.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Name</th><th>DOB</th><th>State</th><th>Channel</th><th>Source</th></tr>
+              </thead>
+              <tbody id="bronze-table"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card layer">
+          <h3><span class="layer-tag silver">Silver</span> Cleaned &amp; deduplicated</h3>
+          <p class="muted small">
+            Names title-cased, emails normalized, duplicates merged — one
+            duplicate signup attempt was blocked.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Name</th><th>DOB</th><th>State</th><th>Channel</th><th>Source</th></tr>
+              </thead>
+              <tbody id="silver-table"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card layer">
+          <h3><span class="layer-tag gold">Gold</span> Business-ready</h3>
+          <div id="gold-cards" class="kpis"></div>
+          <p class="muted small">Customers by state — <span id="gold-by-state"></span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card how">
+      <h2>How it works</h2>
+      <div class="how-grid">
+        <div>
+          <h4>1 · Verify</h4>
+          <p>
+            The <code>ov-w3c-btn</code> web component from
+            <code>@credenceid/online-verifier</code> opens a W3C OpenID4VP
+            session, renders a QR code, and polls for the wallet's response.
+            The backend cryptographically validates the credential.
+          </p>
+        </div>
+        <div>
+          <h4>2 · Ingest</h4>
+          <p>
+            The genuine <code>ov-success</code> result — name, birth year,
+            portrait, trust metadata — becomes one bronze record. Nothing is
+            typed, copied, or invented.
+          </p>
+        </div>
+        <div>
+          <h4>3 · Trust</h4>
+          <p>
+            Silver normalizes and dedupes; gold aggregates. The name on the
+            application is checked against the verified ID — mismatches get
+            flagged, not silently accepted.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>
+        VeriFlow — demo built for a Solutions Engineer take-home assignment
+        (Credence&nbsp;ID). Northgate Bank is fictional.
+      </p>
+      <p class="fineprint">
+        All customer data on this page is synthetic (seed 42). No real
+        identities are used, shown, or stored. Verification results come only
+        from live Credence&nbsp;ID SDK events.
+      </p>
+    </div>
+  </footer>
+
+  <script src="vendor/online-verifier.global.js"></script>
+  <script src="vendor/qrcode.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/pipeline.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
