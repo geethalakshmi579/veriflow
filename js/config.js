@@ -10,8 +10,12 @@
  *    Credence's backend and rejects unregistered domains.
  * ========================================================================== */
 window.VERIFLOW_CONFIG = {
-  licenseKey: "PASTE_YOUR_LICENSE_KEY_HERE",
-  profileId: "PASTE_YOUR_PROFILE_ID_HERE",
+  licenseKey: "CS_5006900575684ee8bfaa33d7e19d829b",
+  profileId: "[
+  {
+    "Age Check Profile 2.0": "1289dbb9-4d60-11f1-bf44-023b9538e812"
+  }
+]",
 
   // Optional: override the Online Verifier backend. Leave commented out to use
   // the backend baked into the published @credenceid/online-verifier package
